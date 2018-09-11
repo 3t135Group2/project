@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.szxs.mapper.BillMapper">
+
+    <select id="serachAll"  resultType="Bill">
+        select b.*,p.proName "provider.proName" from smbms_bill b,smbms_provider p
+        where b.providerId =p.id
+        <if test="null!=productName">
+            and b.productName like concat('%',#{productName},'%')
+        </if>
+        <if test="isPayment >0">
+            and b.isPayment =#{isPayment}
+        </if>
+
+        <if test="providerId>0">
+            and b.providerId = #{providerId}
+        </if>
+    </select>
+    <select id="serachPro" resultType="Provider">
+        select * from smbms_provider
+    </select>
+    <select id="serachPro1" resultType="Provider">
+        select * from smbms_provider  where 1=1
+        <if test="proCode!=null">
+            and proCode like concat('%',#{proCode},'%')
+        </if>
+        <if test="proName!=null">
+            and proName like concat('%',#{proName},'%')
+        </if>
+    </select>
+
+    <insert id="saveBill" >
+    INSERT  INTO smbms_bill VALUES
+     (default,#{billCode},#{productName},null ,#{productUnit},#{productCount},#{totalPrice},#{isPayment},#{createdBy},#{creationDate},null,null,#{providerId})
+    </insert>
+    <delete id="delBill">
+        delete from smbms_bill where id = #{id}
+    </delete>
+    <select id="serachById" resultType="Bill">
+      select b.*,p.proName "provider.proName"  from smbms_bill b,smbms_provider p where b.providerId = p.id and b.id=${id}
+    </select>
+    <update id="updateBillById">
+        update smbms_bill
+         <trim prefix="set" suffixOverrides="," >
+             <if test="billCode!=null">billCode=#{billCode},</if>
+             <if test="productName!=null">productName=#{productName},</if>
+             <if test="productUnit!=null">productUnit=#{productUnit},</if>
+             <if test="productCount!=null">productCount=#{productCount},</if>
+             <if test="totalPrice>0">totalPrice=#{totalPrice},</if>
+             <if test="isPayment>0">isPayment=#{isPayment},</if>
+             <if test="providerId>0">providerId=#{providerId},</if>
+             <if test="modifyBy>0">modifyBy=#{modifyBy},</if>
+             <if test="modifyDate!=null"> modifyDate=#{modifyDate}</if>
+         </trim>
+          where id=#{id}
+    </update>
+
+</mapper>

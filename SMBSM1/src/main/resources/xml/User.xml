@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.szxs.mapper.UserMapper" >
+
+    <select id="loginUser" resultType="User">
+        select * from smbms_user
+        <where>
+            <if test="userCode!=null">
+             and userCode= #{userCode}
+            </if>
+              <if test="userPassword!=null">
+                  and userPassword = #{userPassword}
+              </if>
+        </where>
+    </select>
+
+
+    <sql id="userSql">
+
+            <if test="user.userName!= null and user.userName!='' ">
+                and u.userName  like CONCAT('%',#{user.userName},'%')
+            </if>
+            <if test="user.userRole > 0">
+                and u.userRole =#{user.userRole}
+            </if>
+
+    </sql>
+
+    <select id="serachUser" resultType="User">
+    SELECT  u.id,u.userCode,u.userName,u.userPassword,u.gender,TIMESTAMPDIFF(YEAR, u.birthday, CURDATE()) "age",u.phone,u.address,u.userRole,u.createdBy,u.creationDate,u.modifyBy,u.modifyDate,r.roleName "role.roleName" from smbms_user u,smbms_role r
+    where  r.id = u.userRole and 1=1
+    <include refid="userSql"/>
+      limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="serachTotalRows" resultType="_int">
+        select count(1) from smbms_user u where  1=1
+        <include refid="userSql"/>
+    </select>
+
+    <delete id="delUser">
+        delete from smbms_user where id =#{id}
+    </delete>
+
+    <select id="serachUserByid" resultType="User">
+        select u.id,u.userCode,u.userName,u.userPassword,u.gender,u.birthday,u.phone,u.address,u.userRole,u.createdBy,u.creationDate,u.modifyBy,u.modifyDate,r.roleName "role.roleName" from smbms_user u,smbms_role r where  r.id = u.userRole and  u.id =#{id}
+    </select>
+    <update id="updateUser">
+        update smbms_user
+         <trim prefix="set" suffixOverrides=",">
+             <if test="userName!=null">userName =#{userName},</if>
+             <if test="gender>0">gender=#{gender},</if>
+             <if test="birthday!=null">birthday =#{birthday},</if>
+             <if test="phone!=null">phone=#{phone},</if>
+             <if test="address!=null">address=#{address},</if>
+             <if test="userRole!=null">userRole=#{userRole},</if>
+             <if test="modifyBy!=null">modifyBy=#{modifyBy},</if>
+             <if test="modifyDate!=null">modifyDate =#{modifyDate}</if>
+         </trim>
+         where id =#{id};
+    </update>
+<select id="serachByCode" resultType="User">
+    select * from smbms_user
+     <trim prefix="where" prefixOverrides="and|or">
+         <if test="userCode!=null">
+             userCode =#{userCode}
+         </if>
+     </trim>
+
+</select>
+
+    <insert id="saveUser">
+    insert into smbms_user
+    (id,userCode, userName, userPassword, gender, birthday, phone, address, userRole, createdBy, creationDate)
+     VALUES
+    (default,#{userCode},#{userName},#{userPassword},#{gender},#{birthday},#{phone},#{address},#{userRole},#{createdBy},#{creationDate})
+    </insert>
+    <select id="serachById" resultType="User">
+        select * from smbms_user where id=#{id} and userPassword =#{userPassword};
+    </select>
+    <update id="updatePwd">
+        update smbms_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test="userPassword!=null">
+                userPassword=#{userPassword},
+            </if>
+        </trim>
+        where id=#{id}
+    </update>
+
+</mapper>
