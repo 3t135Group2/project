@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.szxs.dao.StudentDao">
+    <select id="serachAllStu" resultType="Student">
+        select s.*,c.name as "classes.name" from student s,classes c  where s.classId=c.id
+    </select>
+    <insert id="addStu">
+        insert into student values (default,#{name},#{age},#{gender},#{telephone},#{email},#{classId})
+    </insert>
+</mapper>
